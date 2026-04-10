@@ -1,11 +1,19 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import WDefault from "../../imports/1440WDefault/1440WDefault";
 import WDefault375 from "../../imports/375WDefault/375WDefault";
 import { NotificationBanner, createExtractionJob, type ExtractionJob } from "./NotificationBanner";
-import { ImportTargetsInstagramMobile } from "./ImportTargetsInstagramMobile";
+import { HeartBeatLoader } from "./HeartBeatLoader";
 
 export function TargetingDashboard() {
   const [jobs, setJobs] = useState<ExtractionJob[]>([]);
+  const [showStartupLoader, setShowStartupLoader] = useState(true);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      setShowStartupLoader(false);
+    }, 1500);
+    return () => window.clearTimeout(id);
+  }, []);
 
   const handleExtractionStart = useCallback(() => {
     const newJob = createExtractionJob();
@@ -29,6 +37,14 @@ export function TargetingDashboard() {
 
   return (
     <div className="relative size-full">
+      {showStartupLoader && (
+        <div className="fixed inset-0 z-[90] bg-[#0A0A0A]/30 flex items-center justify-center pointer-events-auto">
+          <div className="flex flex-col items-center gap-3">
+            <HeartBeatLoader size={64} label="Loading LetsMatch" />
+          </div>
+        </div>
+      )}
+
       {/* Notification Banners – stacked, non-blocking */}
       <NotificationBanner jobs={jobs} onJobComplete={handleJobComplete} />
 
@@ -39,7 +55,9 @@ export function TargetingDashboard() {
 
       {/* Mobile */}
       <div className="block md:hidden w-full h-full overflow-y-auto bg-[#f3f3f3]">
-        <ImportTargetsInstagramMobile onStartExtraction={() => handleExtractionStateChange(true)} />
+        <div className="min-h-full w-full max-w-[375px] mx-auto">
+          <WDefault375 onExtractionStateChange={handleExtractionStateChange} />
+        </div>
       </div>
     </div>
   );

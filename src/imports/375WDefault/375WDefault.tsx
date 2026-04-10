@@ -2347,6 +2347,7 @@ export default function Component375WDefault({ onExtractionStateChange }: { onEx
   const [isExtracting, setIsExtracting] = useState(false);
 
   const handleExtractClick = () => {
+    setIsExtracting(true);
     onExtractionStateChange?.(true);
   };
 
